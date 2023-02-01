@@ -1,0 +1,9 @@
+[submodule "deps/raylib"]
+	path = deps/raylib
+	url = https://github.com/raysan5/raylib.git
+[submodule "deps/raygui"]
+	path = deps/raygui
+	url = https://github.com/raysan5/raygui.git
+[submodule "deps/shedskin"]
+	path = deps/shedskin
+	url = https://github.com/shedskin/shedskin.git
