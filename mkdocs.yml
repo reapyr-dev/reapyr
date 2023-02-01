@@ -1,0 +1,8 @@
+site_name: reapyr-dev
+site_url: https://reapyr-dev.github.io/
+nav:
+    - Home: index.md
+    - Test: testpage.md
+
+
+theme: readthedocs
