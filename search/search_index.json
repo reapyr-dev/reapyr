@@ -1,1 +1,1 @@
-{"config":{"indexing":"full","lang":["en"],"min_search_length":3,"prebuild_index":false,"separator":"[\\s\\-]+"},"docs":[{"location":"","text":"index page testing a change here.","title":"Home"},{"location":"testpage/","text":"test page","title":"Test"}]}
+{"config":{"lang":["en"],"separator":"[\\s\\-]+","pipeline":["stopWordFilter"]},"docs":[{"location":"","title":"Home","text":"<p>index page</p> <p>testing a change here.</p>"},{"location":"testpage/","title":"Test","text":"<p>test page</p>"}]}
