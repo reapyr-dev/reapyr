@@ -5,4 +5,8 @@ nav:
     - Test: testpage.md
 
 
-theme: readthedocs
+theme:
+  name: material
+  palette:
+    scheme: slate
+    primary: black
