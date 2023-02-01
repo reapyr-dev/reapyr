@@ -2,10 +2,14 @@ site_name: reapyr-dev
 site_url: https://reapyr-dev.github.io/reapyr
 nav:
     - Home: index.md
-        - Home 2: index.md
-        - Home 3: index.md
-            - Home 4: index.md
-            - Home 5: index.md
+        - Home 2:
+            - index.md
+        - Home 3: 
+            - index.md
+            - Home 4: 
+                - index.md
+            - Home 5:
+                - index.md
     - Test: testpage.md
 
 
