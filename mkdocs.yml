@@ -1,5 +1,5 @@
 site_name: reapyr-dev
-site_url: https://reapyr-dev.github.io/
+site_url: https://reapyr-dev.github.io/reapyr
 nav:
     - Home: index.md
     - Test: testpage.md
