@@ -2,7 +2,8 @@
 ![Reapyr](docs/media/reapyrlogo256.png?raw=true "Reapyr")
 
 
-# Reapyr: Develop with the simplicity of Python, and the performance of C/C++ !
+# Welcome to Reapyr!
+## Develop with the simplicity of Python, and the performance of C/C++ !
 
 Reapyr is a set of [Python](https://www.python.org/) bindings for the amazing [Raylib](https://www.raylib.com/) game library. 
 
@@ -11,9 +12,11 @@ It provides both [CPython](https://en.wikipedia.org/wiki/CPython) bindings as we
 Reapyr aims to run on as many platforms as possible - including desktop and mobile targets.
 
 
-# Note: Alpha disclaimer!
+# DISCLAIMER: Alpha stuff!
 
-Stuff is currently very early dev status - this is purely a volunteer driven project, and we're working to get things stable soon. Feel free to stop over to the [Raylib Python Discord channel](https://discord.com/channels/426912293134270465/661390741104230421) to get live updates as we work, and / or help out!
+Everything is currently very early dev status - this is purely a volunteer driven project, and we're working to get things stable soon. Feel free to stop over to the [Raylib Python Discord channel](https://discord.com/channels/426912293134270465/661390741104230421) to get live updates as we work, and / or help out!
+
+In the meantime please expect things to probably crash/burn/explode/etc. or plain simply not work yet.  Jump into the Discord for help if you still want to try things out!
 
 # Quickstart
 
