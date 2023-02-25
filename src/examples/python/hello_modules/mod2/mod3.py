@@ -1,0 +1,1 @@
+def mod3func(): return "mod3func"
