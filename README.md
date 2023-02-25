@@ -26,9 +26,9 @@ In the meantime please expect things to probably crash/burn/explode/etc. or plai
 
 1. Download and install [w64devkit](https://github.com/skeeto/w64devkit/releases) (click link for download location.)  Most likely on modern PC you'll want the 64 bit version, such as [w64devkit-i686-1.18.0.zip](https://github.com/skeeto/w64devkit/releases/download/v1.18.0/w64devkit-i686-1.18.0.zip)
 
-2. Extract the zip from previous step, an open a command prompt on your PC, and run the w64devkit.exe file from install folder. This will drop you into a bash shell, this lets you work in a much more portable way. 
+2. Extract the zip from previous step, open a command prompt on your PC, and run the w64devkit.exe file from the install folder. This will drop you into a bash shell, this lets you work in a much more portable way. 
 
-3. Once in a bash shell, go to a suitable folder where you'll download and install the Reapyr SDK. Create a new if needed, such as via:  ```mkdir mydevfolder && cd mydevfolder```
+3. Once in a bash shell, go to a suitable folder where you'll download and install the Reapyr SDK. Create a new folder if needed, such as via:  ```mkdir mydevfolder && cd mydevfolder```
 
 
 ### For Linux:
