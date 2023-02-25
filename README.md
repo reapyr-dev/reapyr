@@ -50,6 +50,7 @@ cd reapyr/src/modules/quickstart
 Test a CPython example:
 ```[bash]
 cd ../../examples/raylib/hello_raylib/
+python ./hello_raylib.py
 ```
 You should see a Raylib window open up with the text: *'You created your first window!'*
 
