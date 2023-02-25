@@ -1,9 +1,18 @@
 [submodule "deps/raylib"]
 	path = deps/raylib
-	url = https://github.com/raysan5/raylib.git
+	url = https://github.com/reapyr-dev/raylib.git
 [submodule "deps/raygui"]
 	path = deps/raygui
-	url = https://github.com/raysan5/raygui.git
+	url = https://github.com/reapyr-dev/raygui.git
 [submodule "deps/shedskin"]
 	path = deps/shedskin
-	url = https://github.com/shedskin/shedskin.git
+	url = https://github.com/reapyr-dev/shedskin.git
+[submodule "deps/bdwgc"]
+	path = deps/bdwgc
+	url = https://github.com/reapyr-dev/bdwgc.git
+[submodule "deps/raylibpyctbg"]
+	path = deps/raylibpyctbg
+	url = https://github.com/reapyr-dev/raylibpyctbg.git
+[submodule "deps/libatomic_ops"]
+	path = deps/libatomic_ops
+	url = https://github.com/reapyr-dev/libatomic_ops.git
