@@ -2,7 +2,7 @@
 ![Reapyr](docs/media/reapyrlogo256.png?raw=true "Reapyr")
 
 
-# Reapyr: Develop with the simplicity of Python, and performance of C/C++ !
+# Reapyr: Develop with the simplicity of Python, and the performance of C/C++ !
 
 Reapyr is a set of [Python](https://www.python.org/) bindings for the amazing [Raylib](https://www.raylib.com/) game library. 
 
