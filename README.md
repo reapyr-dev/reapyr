@@ -9,7 +9,7 @@ Reapyr is a set of [Python](https://www.python.org/) bindings for the amazing [R
 
 It provides both [CPython](https://en.wikipedia.org/wiki/CPython) bindings as well as bindings for [Shedskin](https://shedskin.readthedocs.io/en/latest/) - which is a [transpiler](https://en.wikipedia.org/wiki/Source-to-source_compiler) capable of converting Python code to C++.
 
-Reapyr aims to run on as many platforms as possible - including desktop and mobile targets.
+Reapyr aims to allow you to write software in Python that will run on as many platforms as possible (including all major desktop and mobile targets), at as close to C/C++ performance as is possible.
 
 
 # DISCLAIMER: Alpha stuff!
@@ -24,9 +24,9 @@ In the meantime please expect things to probably crash/burn/explode/etc. or plai
 
 ### For Windows:
 
-1. Download and install [w64devkit](https://github.com/skeeto/w64devkit/releases) (click link for download location.)  Most likely on modern PC you'll want the 64 bit version, such as [w64devkit-i686-1.18.0.zip](https://github.com/skeeto/w64devkit/releases/download/v1.18.0/w64devkit-i686-1.18.0.zip)
+1. Download and install [w64devkit](https://github.com/skeeto/w64devkit/releases) (click link for download location.)  Most likely on modern PC you'll want the 64 bit version, such as [w64devkit-i686-1.18.0.zip](https://github.com/skeeto/w64devkit/releases/download/v1.18.0/w64devkit-i686-1.18.0.zip). Installing can be as simple as unzipping the .zip file that was downloaded into some folder.
 
-2. Extract the zip from previous step, open a command prompt on your PC, and run the w64devkit.exe file from the install folder. This will drop you into a bash shell, this lets you work in a much more portable way. 
+2. Extract the zip from previous step, open a command prompt on your PC, and run the w64devkit.exe file from the install folder. This will drop you into a bash shell. This shell lets you work in a much more portable way. (Trust us, this shell is much better than the Windows default. It also allows you to work in a way that is maximally compatible with most other major OS's and platforms).
 
 3. Once in a bash shell, go to a suitable folder where you'll download and install the Reapyr SDK. Create a new folder if needed, such as via:  ```mkdir mydevfolder && cd mydevfolder```
 
@@ -57,7 +57,7 @@ python ./hello_raylib.py
 ```
 You should see a Raylib window open up with the text: *'You created your first window!'*
 
-Next, run an included script that converts the same example to C++ via Shedskin and run it:
+Next, run an included script that converts the same example to C++ via Shedskin and runs it:
 
 ```[bash]
 # *** STAY TUNED: COMING SOON! ***
