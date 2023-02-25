@@ -75,7 +75,7 @@ class Preprocessor():
                 return
 
     def preprocessFile(self, f):
-        print ("Preproccessing file:", f)
+        print ("Preprocessing file:", f)
         file = open(f, 'r')
         lines = file.readlines()
         self.index = 0
@@ -86,20 +86,22 @@ class Preprocessor():
 
 from pathlib import Path
 filePath = Path(os.path.realpath(__file__))
-root = filePath.parents[5]
+root = filePath.parents[4]
 folder = filePath.parent
 tmp = folder / "tmp"
 
 headers = [
     root / f"deps/raylib/src/raylib.h",
     root / f"deps/raylib/src/raymath.h",
-    root / f"deps/raygui/src/raygui.h"
+    root / f"deps/raygui/src/raygui.h",
+    root / f"deps/raylib/src/rlgl.h"
 ]
 
 params = [
     "-d RLAPI",
     "-d RMAPI",
-    "-d RAYGUIAPI"
+    "-d RAYGUIAPI",
+    "-d RLAPI",
 ]
 
 def preprocess():
