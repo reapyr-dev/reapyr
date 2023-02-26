@@ -1,0 +1,8 @@
+/deps/installed
+build
+tmp
+__pycache__
+*.exe
+*.dll
+src/modules/cpython/lib/raylib.py
+src/modules/quickstart/_setvars.sh

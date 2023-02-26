@@ -3,11 +3,11 @@
 cd $REAPYR_SDK_ROOT/deps/raylib
 mkdir -p build
 cd build
-cmake -G "MinGW Makefiles" -DBUILD_SHARED_LIBS=ON -DBUILD_EXAMPLES=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$REAPYR_SDK_ROOT/installed ..
+cmake -G "MinGW Makefiles" -DBUILD_SHARED_LIBS=ON -DBUILD_EXAMPLES=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$REAPYR_SDK_ROOT/deps/installed ..
 cmake --build .
 cmake --install .
 
-cmake -G "MinGW Makefiles" -DBUILD_SHARED_LIBS=OFF -DBUILD_EXAMPLES=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$REAPYR_SDK_ROOT/installed ..
+cmake -G "MinGW Makefiles" -DBUILD_SHARED_LIBS=OFF -DBUILD_EXAMPLES=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$REAPYR_SDK_ROOT/deps/installed ..
 cmake --build .
 cmake --install .
 
@@ -15,7 +15,7 @@ cmake --install .
 cd $REAPYR_SDK_ROOT/deps/bdwgc
 mkdir -p build
 cd build
-cmake -G "MinGW Makefiles" -Denable_threads=OFF -Denable_cplusplus=ON -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX=$REAPYR_SDK_ROOT/installed ..
+cmake -G "MinGW Makefiles" -Denable_threads=OFF -Denable_cplusplus=ON -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX=$REAPYR_SDK_ROOT/deps/installed ..
 cmake --build .
 cmake --install .
 
@@ -23,7 +23,7 @@ cmake --install .
 cd $REAPYR_SDK_ROOT/deps/libpcre
 mkdir -p build
 cd build
-cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$REAPYR_SDK_ROOT/installed ..
+cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$REAPYR_SDK_ROOT/deps/installed ..
 cmake --build .
 cmake --install .
 
