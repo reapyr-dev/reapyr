@@ -16,3 +16,6 @@
 [submodule "deps/libatomic_ops"]
 	path = deps/libatomic_ops
 	url = https://github.com/reapyr-dev/libatomic_ops.git
+[submodule "deps/libpcre"]
+	path = deps/libpcre
+	url = https://github.com/reapyr-dev/libpcre.git
