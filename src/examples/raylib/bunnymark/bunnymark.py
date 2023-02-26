@@ -71,7 +71,7 @@ def bunnyMain():
     while not raylib.WindowShouldClose():    # Detect window close button or ESC key
         # Update
         #----------------------------------------------------------------------------------
-        if raylib.IsMouseButtonDown(raylib.MOUSE_BUTTON_LEFT):
+        if raylib.IsMouseButtonDown(0):
             # Create more bunnies
             for i in range(10000):
                 if bunniesCount < MAX_BUNNIES:
