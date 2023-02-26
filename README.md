@@ -42,7 +42,7 @@ First grab everything from Github, including submodules:
 git clone --recurse-submodules https://github.com/reapyr-dev/reapyr.git
 ```
 
-Run a script that will Build raylib, bindings, and it copies stuff around so it works at runtime:
+Run ```setenv.sh``` first, as initializes lots of environment variables that Reapyr's toolset needs.  Then run a script that will Build raylib, bindings, and it copies stuff around so it works at runtime:
 
 ```[bash]
 cd reapyr/src/modules/quickstart
@@ -60,5 +60,7 @@ You should see a Raylib window open up with the text: *'You created your first w
 Next, run an included script that converts the same example to C++ via Shedskin and runs it:
 
 ```[bash]
-# *** STAY TUNED: COMING SOON! ***
+ssrun ./hello_raylib.py
 ```
+
+That's it! After the last command you'll see the same result as when run with ```python```, but behind the scenes ```ssrun``` actually converted *all* the code to C++, compiled it, and ran an executable!
