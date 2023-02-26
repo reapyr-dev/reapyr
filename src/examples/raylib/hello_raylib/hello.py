@@ -1,5 +1,5 @@
 import raylib
-print(raylib.__file__)
+#print(raylib.__file__)
 raylib.InitWindow(800, 600, "title")
 raylib.SetTargetFPS(60)
 
