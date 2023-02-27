@@ -1,12 +1,24 @@
-
 # Build Raylib 
+
+# Before building, this applies a patch to enable raygui if not already enabled
+if ! grep -q raygui $REAPYR_SDK_ROOT/deps/raylib/src/CMakelists.txt; then
+  cp $REAPYR_SDK_ROOT/deps/raygui/src/raygui.h $REAPYR_SDK_ROOT/deps/raylib/src/
+  cd $REAPYR_SDK_ROOT/deps/raylib/src/
+  patch < $REAPYR_SDK_ROOT/src/modules/quickstart/resources/useraygui.patch
+  echo "Applied patch"
+fi
+
+# Setup for cmake
 cd $REAPYR_SDK_ROOT/deps/raylib
 mkdir -p build
 cd build
+
+# Build Raylib shared library (dll/so) here for cpython binding
 cmake -G "MinGW Makefiles" -DBUILD_SHARED_LIBS=ON -DBUILD_EXAMPLES=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$REAPYR_SDK_ROOT/deps/installed ..
 cmake --build .
 cmake --install .
 
+# Build Raylib static library (.a) here for shedskin binding, static linking performance is better
 cmake -G "MinGW Makefiles" -DBUILD_SHARED_LIBS=OFF -DBUILD_EXAMPLES=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$REAPYR_SDK_ROOT/deps/installed ..
 cmake --build .
 cmake --install .

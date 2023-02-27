@@ -15,7 +15,7 @@ from raylibpyctbg import rlapi2
 
 rlapi2.main(
     # inputs to process
-    [tmp / 'raylib.h.json', tmp / 'raymath.h.json',  tmp / 'rlgl.h.json'], #tmp / 'raygui.h.json', 
+    [tmp / 'raylib.h.json', tmp / 'raymath.h.json',  tmp / 'rlgl.h.json', tmp / 'raygui.h.json'], #, 
     # output python file to generate
     tmp / 'raylib.py',
     # config file for raylibpyctbg to operate

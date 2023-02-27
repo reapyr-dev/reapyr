@@ -1,0 +1,19 @@
+index 21cd3d3f..5da02a7f 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -35,6 +35,7 @@ set(raylib_sources
+     rtext.c
+     rtextures.c
+     utils.c
++    raygui.c
+     )
+ 
+ # <root>/cmake/GlfwImport.cmake handles the details around the inclusion of glfw
+diff --git a/src/raygui.c b/src/raygui.c
+new file mode 100644
+index 00000000..1878467e
+--- /dev/null
++++ b/src/raygui.c
+@@ -0,0 +1,2 @@
++#define RAYGUI_IMPLEMENTATION
++#include "raygui.h"
