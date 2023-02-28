@@ -297,7 +297,7 @@ namespace rlc {
         # Generated equivalents. Gotta love C and global
         # namespaces!
         for i in utils.data["defines"]:
-            output += f"#undef {i['name']}\n"
+            output += f"#undef {i['name'].split('(')[0]}\n"
         
     elif line.strip() == "namespace __raylib__ {":
         output += """
