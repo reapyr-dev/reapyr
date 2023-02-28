@@ -8,9 +8,6 @@ if ! grep -q raygui $REAPYR_SDK_ROOT/deps/raylib/src/CMakelists.txt; then
   echo "Applied patch"
 fi
 
-# 'install' the raygui header
-cp $REAPYR_SDK_ROOT/deps/raygui/src/raygui.h $REAPYR_SDK_ROOT/deps/installed/include/
-
 # Setup for cmake
 cd $REAPYR_SDK_ROOT/deps/raylib
 mkdir -p build
@@ -20,6 +17,9 @@ cd build
 cmake -G "MinGW Makefiles" -DBUILD_SHARED_LIBS=ON -DBUILD_EXAMPLES=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$REAPYR_SDK_ROOT/deps/installed ..
 cmake --build .
 cmake --install .
+
+# 'install' the raygui header
+cp $REAPYR_SDK_ROOT/deps/raygui/src/raygui.h $REAPYR_SDK_ROOT/deps/installed/include/
 
 # Build Raylib static library (.a) here for shedskin binding, static linking performance is better
 cmake -G "MinGW Makefiles" -DBUILD_SHARED_LIBS=OFF -DBUILD_EXAMPLES=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$REAPYR_SDK_ROOT/deps/installed ..
