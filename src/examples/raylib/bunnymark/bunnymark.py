@@ -41,12 +41,6 @@ class Bunny:
 # Program main entry point
 #------------------------------------------------------------------------------------
 
-# These will get removed soon, here while SS bindings are getting cleaned up
-RAYWHITE = raylib.Color(255,255,255,255)
-BLACK = raylib.Color(0,0,0,255)
-GREEN = raylib.Color(0, 228, 48, 255)
-MAROON = raylib.Color( 190, 33, 55, 255 )
-
 def bunnyMain():
     # Initialization
     #--------------------------------------------------------------------------------------
@@ -103,7 +97,7 @@ def bunnyMain():
         #----------------------------------------------------------------------------------
         raylib.BeginDrawing()
 
-        raylib.ClearBackground(RAYWHITE)
+        raylib.ClearBackground(raylib.RAYWHITE)
 
         for i in range(bunniesCount):
             # NOTE: When internal batch buffer limit is reached (MAX_BATCH_ELEMENTS),
@@ -116,9 +110,9 @@ def bunnyMain():
             #raylib.DrawTexture(texBunny, bunny.position.x, bunny.position.y, bunny.color)  
             raylib.DrawTexture(texBunny,  bunny.position.x, bunny.position.y, bunny.color)  
 
-        raylib.DrawRectangle(0, 0, screenWidth, 40, BLACK)
-        raylib.DrawText("bunnies: " + str(bunniesCount), 120, 10, 20, GREEN)
-        raylib.DrawText("batched draw calls: " + str(1 + int(bunniesCount/MAX_BATCH_ELEMENTS)), 320, 10, 20, MAROON)
+        raylib.DrawRectangle(0, 0, screenWidth, 40, raylib.BLACK)
+        raylib.DrawText("bunnies: " + str(bunniesCount), 120, 10, 20, raylib.GREEN)
+        raylib.DrawText("batched draw calls: " + str(1 + int(bunniesCount/MAX_BATCH_ELEMENTS)), 320, 10, 20, raylib.MAROON)
 
         raylib.DrawFPS(10, 10)
 

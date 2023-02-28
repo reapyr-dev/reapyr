@@ -1,12 +1,40 @@
+#
+# This file is code for 'Step 1' module of the Shedskin binding generation process.
+#
+# This module loads a JSON file which describes the elements of a C API, and generates a
+# Python module that mimics that API.   All structures become classes and all functions 
+# become Python methods.  However, no elements actually /do/ anything (the resulting Python
+# code is just a shell, it doesn't actually invoke APIs) - they simply contain
+# 'cosmetic' markers like 'todo_xyz'.  The purpose of this is for other steps of the 
+# binding generation process to look for these markers and swap them out for C++ code that
+# actually invokes the real APIs.
+#
+# This ensures that as the Shedskin compiler evolves, modules generated via these scripts
+# will take advantage of any new optimizations in SS's output for any/all bindings automated.
+# If one were to genereate the Shedskin C++ code directly, there is a chance in the future that
+# Output of this script would fall out of sync with Shedskin's output and cease to be compatible.
+#
+
 import gen_ss_utils as utils
 
+'''
+# Just for ease of reference, this is schema of the JSON file that raylib parser generates.
+# It is the input data for this utility.
+{
+    'defines':   ['name', 'type', 'value', 'description'],
+    'structs':   ['name', 'description', {'fields':['type', 'name', 'description']}],
+    'aliases':   ['type', 'name', 'description'],
+    'enums':     ['name', 'description', {'values':['name', 'value', 'description']}],
+    'callbacks': ['name', 'description', 'returnType', {'params':['type', 'name']}],
+    'functions': ['name', 'description', 'returnType', {'params':['type', 'name']}]
+}
+'''
+
+# Helper to generate accessor for API class setter
 def makeSetter(name, type):
-    #if utils.isList(type):
-        #return "\t\tfor i in range(len({0})): self.set_{0}({0}[i], i)".format(name)
-        #return "\t\tfor i in range(len({0})): self.set_{0}({0}[i], i)".format(name)
-    #return "\t\tself.set_{0}({0})".format(name)
     return "\t\tself.{0} = {0}".format(name)
 
+# Converts a C type to value for inferencing via typeValue()
 def typeParms(ctype):
     type = utils.calctype(ctype)
     
@@ -20,20 +48,13 @@ def typeParms(ctype):
 
     return ""
 
+# Returns 'default' consts or values for any type. Used to trigger Shedskin inferencing
 def typeValue(ctype, apiParam, classParam):
-    #print ("typeValue:", ctype)
     mapped = utils.maptype(ctype)
 
     # check if its a pointer type
     if mapped == "list":
         return "{}()".format(utils.ptrType(ctype))
-
-    '''
-    if classParam and mapped == "list": 
-        return "[]"       
-    elif apiParam and mapped == "list": 
-        return "[{}]".format( typeParms(ctype))
-    '''
 
     # check if basic type
     if utils.maptype(ctype) in utils.defaults:
@@ -43,30 +64,23 @@ def typeValue(ctype, apiParam, classParam):
     if classParam: return "None"
     else: return "{}()".format(utils.maptype(ctype)) # typeParms(ctype)
 
-def gen_ss_py():    
-    utils.load_json()
-    for i in utils.data["aliases"]: 
-        utils.aliases[i["name"]] = i["type"]
-    #print ("debug:", utils.aliases, utils.maptype("Texture2D"), utils.maptype("Texture2D"), typeValue("Texture2D", True, False))
-    #quit()
+# Main entrypoint for this module. It will iterate every section
+# of the JSON file and generate corresponding Python code.
+def gen_ss_py():
 
-    
-    '''
-    # Just for ease of reference, this is schema of the JSON file that raylib parser generates.
-    # It is the input data for this utility.
-    {
-        'defines':   ['name', 'type', 'value', 'description'],
-        'structs':   ['name', 'description', {'fields':['type', 'name', 'description']}],
-        'aliases':   ['type', 'name', 'description'],
-        'enums':     ['name', 'description', {'values':['name', 'value', 'description']}],
-        'callbacks': ['name', 'description', 'returnType', {'params':['type', 'name']}],
-        'functions': ['name', 'description', 'returnType', {'params':['type', 'name']}]
-    }
-    '''
+    # Loads the JSON describing API we'll analyze
+    utils.load_json()
+
+    # Aliases store 'alternate' names for symbols. We'll store these
+    # So that if any are encountered we can swap for the 'real' name
+    for i in utils.data["aliases"]: 
+        utils.aliases[i["name"]] = i["type"] # This is standalone list for reference
+        utils.typemap[i["name"]] = i["type"] # This is modifying list of types for conversions
 
     # Will hold .py output
     output=""
 
+    # Goes to top of output .py file, inits dependant types.
     prologue= """
 
 from sstypes import *
@@ -75,37 +89,14 @@ class VoidPointer:
     def __init__(self, val=int(0)):
         self.val = val
 """
-
-    for i in utils.data["aliases"]: utils.typemap[i["name"]] = i["type"]
-
     output += prologue
-
-    for i in utils.data["defines"]:
-        if i["type"] in ["MACRO", "UNKNOWN"]: continue
-        val = i["value"]
-        if val == "": val = "1"
-        if i["type"] == "STRING": val = '"'+val+'"'
-        if i["type"] == "FLOAT_MATH": 
-            val = val.replace("f", "")
-            if "(" in val or "*" in val or "\\" in val or "+" in val: continue
-        if i["type"] == "COLOR": val = val.replace("CLITERAL(Color){", "[").replace("}", "]")
-        
-        output += "RL_{} = {}\n".format(i["name"], val)
-
-    for j in utils.data["enums"]:
-        for i in j["values"]:
-            output += "RL_{} = {}\n".format(i["name"], i["value"])
 
     output += "def todo_create_rlobj(val): pass\n"
     output += "def todo_setter(val): pass\n"
     output += "def todo_getter(val): pass\n"
     output += "def todo_c_implementation_here(val): pass\n"
     output += "def todo_return(val): pass\n"
-    output += "int0 = 0\n"
-    output += "float0 = 0.0\n"
-    output += "bool0 = False\n"
-    output += "str0 = ''\n"
-    #output += "emptyList=[]\n"
+
     for i in utils.data["structs"]:
         output += "todo_{} = 0\n".format((i["name"]))
         output +=  "".join(["todo_{}_{} = 0\n".format(i["name"], j["name"]) for j in i["fields"]])
@@ -114,8 +105,7 @@ class VoidPointer:
     for i in utils.data["functions"]:
         output += "todo_{} = 0\n".format((i["name"]))
         utils.defmap[i["name"]] = i
-    #for i in utils.data["aliases"]: utils.typemap[i["name"]] = i["type"]
-
+    
     for i in utils.data["structs"]:
         utils.defmap[i["name"]] = i
         for j in i["fields"]:
@@ -138,18 +128,14 @@ class VoidPointer:
         
         getter_fmt = "\t@property\n\tdef {1}(self):\n\t\ttodo_getter(todo_{0}_{1})\n\t\treturn {3}"
         setter_fmt = "\t@{1}.setter\n\tdef {1}(self, val):\n\t\ttodo_setter(todo_{0}_{1} ,val)"
-        #setter_fmt = "\tdef set_{1}(self, val, idx=int(0)):\n\t\ttodo_setter(todo_{0}_{1})"
-        #getter_fmt = "\tdef get_{1}(self, idx=int(0)):\n\t\ttodo_getter(todo_{0}_{1})\n\t\treturn {3}"
-        #print ("*****************************************jtype", i["name"])
+
         accessors = "\n".join([getter_fmt.format(i["name"], j["name"], "", typeValue(j["type"], False, False)) + "\n" + setter_fmt.format(i["name"], j["name"], "val")  for j in i["fields"]])
-        #print ("*****************************************jtype2222", i["name"])
+
         output += accessors + "\n"
         
 
-        #output += "{}List = list[{}]\n\n".format(i["name"], i["name"])
 
-    #callbacks: ['name', 'description', 'returnType', 'params':['type', 'name']]
-
+    # callbacks: ['name', 'description', 'returnType', 'params':['type', 'name']]
     output += "\n# Callbacks:\n"
     for i in utils.data["callbacks"]:
         output += "class {}:\n".format(i["name"])
@@ -157,8 +143,23 @@ class VoidPointer:
         output += "\tdef invoke(self, {})-> {}: pass\n".format(params, utils.maptype(i["returnType"]))
     output += "\n"
 
-    #'functions': ['name', 'description', 'returnType', 'params':['type', 'name']]
+    for i in utils.data["defines"]:
+        if i["type"] in ["MACRO", "UNKNOWN"]: continue
+        val = i["value"]
+        if val == "": val = "1"
+        if i["type"] == "STRING": val = '"'+val+'"'
+        if i["type"] == "FLOAT_MATH": 
+            val = val.replace("f", "")
+            if "(" in val or "*" in val or "\\" in val or "+" in val: continue
+        if i["type"] == "COLOR": val = val.replace("CLITERAL(Color){", "Color(").replace("}", ")")
+        
+        output += "{} = {}\n".format(i["name"], val)
 
+    for j in utils.data["enums"]:
+        for i in j["values"]:
+            output += "{} = {}\n".format(i["name"], i["value"])
+
+    # 'functions': ['name', 'description', 'returnType', 'params':['type', 'name']]
     for i in utils.data["functions"]:
         ret = utils.maptype(i["returnType"])
 
@@ -190,12 +191,10 @@ class VoidPointer:
         params = ", ".join([typeValue(j["type"], True, False) for j in i["params"]]) if "params" in i.keys() else ""
         output += "\t{}({})\n".format(i["name"], params)
 
+    # All python code has been generated in variable 'output', now it is written to actual Python text file
     import os
-    #os.system("mkdir ./tmp/ss")    
-    os.system(f"mkdir {utils.tmp}")
+    os.system(f"mkdir {utils.tmp}")     # Creates a temp folder to store output
     outfile = utils.tmp / "raylib.py"
-    #outfile = "D:/dev/vsc_wksp1/raylib-dev01/reapyr/src/examples/hello_reapyr/raylib.py"
-    #outfile = './tmp/ss/raylib.py'
     with open(outfile, 'w') as f:
         f.write(output)
 

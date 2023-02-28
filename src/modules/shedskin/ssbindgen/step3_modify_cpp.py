@@ -239,6 +239,12 @@ namespace rlc {
     #include <raylib.h>
 }
             """
+        # Have to undefine C globals or they clash with
+        # Generated equivalents. Gotta love C and global
+        # namespaces!
+        for i in utils.data["defines"]:
+            output += f"#undef {i['name']}\n"
+        
     elif line.strip() == "namespace __raylib__ {":
         output += """
 
