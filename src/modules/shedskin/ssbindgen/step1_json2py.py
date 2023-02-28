@@ -175,8 +175,6 @@ from sstypes import *
         output += "\n".join(["\ttemp{0}_{1}=temp{0}.{1}".format(i["name"], j["name"]) for j in i["fields"]]) + "\n\n"
         output += "\n".join(["\ttemp{0}.{1}={2}".format(i["name"], j["name"], typeValue(j["type"], True, False)) for j in i["fields"]]) + "\n\n"
 
-    output += "\ttempVoidPointer = VoidPointer(1)\n";
-
     for i in utils.data["functions"]:
         params = ", ".join([typeValue(j["type"], True, False) for j in i["params"]]) if "params" in i.keys() else ""
         output += "\t{}({})\n".format(i["name"], params)
