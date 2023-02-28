@@ -11,10 +11,9 @@ class SSIntPtr;
 class SSFloatPtr;
 class SSDoublePtr;
 class SSCharPtr;
-
+class SSStrList;
 
 extern str *__name__;
-
 
 extern class_ *cl_VoidPtr;
 class VoidPtr : public pyobj {
@@ -142,6 +141,20 @@ public:
     }
     __ss_int __getitem__(__ss_int i) {return (__ss_int)ptr[i];}
     void *__setitem__(__ss_int i, __ss_int val) { ptr[i]=(unsigned char)val; return NULL; }
+};
+
+extern class_ *cl_SSStrList;
+class SSStrList : public pyobj {
+public:
+    char **ptr;
+
+    SSStrList() {}
+    SSStrList(const char **ptr) {
+        this->__class__ = cl_SSStrList;
+        this->ptr = (char**)ptr;
+    }
+    str *__getitem__(__ss_int i) { return new str(ptr[i]); }
+    void *__setitem__(__ss_int key, str *val) { return NULL; }
 };
 
 void __init();

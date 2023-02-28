@@ -44,6 +44,11 @@ class SSUCharPtr:
     def __getitem__(self, i): return 0
     def __setitem__(self, key, val): pass
 
+class SSStrList:
+    def __init__(self, ptr=None): self.ptr = None
+    def __getitem__(self, i): return ""
+    def __setitem__(self, key, val): pass
+
 def makeFloatPtr(): return SSFloatPtr(0.0)
 
 '''

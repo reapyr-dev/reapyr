@@ -15,9 +15,30 @@ fsroot_modules = fsroot / "src/modules"
 def posix_path(s): return str(PurePosixPath(s)).replace("\\", "")
 
 def load_json():
-    global data
+    global data, aliases, typemap
+
     with open(fsroot_modules / "cpython/cpygen/tmp/raylib.h.json") as f:  
         data = json.load(f)
+    
+    # Aliases store 'alternate' names for symbols. We'll store these
+    # So that if any are encountered we can swap for the 'real' name
+    for i in data["aliases"]: 
+        aliases[i["name"]] = i["type"] # This is standalone list for reference
+        typemap[i["name"]] = i["type"] # This is modifying list of types for conversions
+
+    # Next we cache most symbols into a lookup map 'defmap' so we can quickly
+    # find them later for analysis during various codegen steps.
+
+    for i in data["functions"]:
+        defmap[i["name"]] = i
+    
+    for i in data["structs"]:
+        defmap[i["name"]] = i
+        for j in i["fields"]:
+            defmap[i["name"]+"_"+j["name"]] = j
+        
+    for i in data["aliases"]: defmap[i["name"]] = defmap[i["type"]]
+    
 
 basictypes = ["int", "float", "str", "bool"]
 

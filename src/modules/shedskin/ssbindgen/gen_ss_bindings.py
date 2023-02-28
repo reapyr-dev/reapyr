@@ -20,8 +20,6 @@ https://shedskin.readthedocs.io/en/latest/documentation.html#calling-c-c-code
 
 '''
 
-import gen_ss_utils as utils
-
 # Step 1: Raylib C API has a parser utility that generates JSON from the API for ease of binding work. We assume
 # This JSON file already exists, we first load it and generate python code corresponding to the API.  If this file
 # does not exist it can be generated with the reapyr/src/modules/cpython/tools/header2json/header2json.py utility

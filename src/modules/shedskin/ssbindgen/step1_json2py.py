@@ -48,12 +48,21 @@ def typeParms(ctype):
 
     return ""
 
+typeOverrides = {
+    "char **": "SSStrList",
+    "const char **": "SSStrList"
+}
+
 # Returns 'default' consts or values for any type. Used to trigger Shedskin inferencing
 def typeValue(ctype, apiParam, classParam):
+    if ctype in typeOverrides.keys():
+        return "{}()".format(typeOverrides[ctype])
+    
     mapped = utils.maptype(ctype)
 
     # check if its a pointer type
     if mapped == "list":
+        
         return "{}()".format(utils.ptrType(ctype))
 
     # check if basic type
@@ -70,12 +79,6 @@ def gen_ss_py():
 
     # Loads the JSON describing API we'll analyze
     utils.load_json()
-
-    # Aliases store 'alternate' names for symbols. We'll store these
-    # So that if any are encountered we can swap for the 'real' name
-    for i in utils.data["aliases"]: 
-        utils.aliases[i["name"]] = i["type"] # This is standalone list for reference
-        utils.typemap[i["name"]] = i["type"] # This is modifying list of types for conversions
 
     # Will hold .py output
     output=""
@@ -104,15 +107,7 @@ class VoidPointer:
     #'functions': ['name', 'description', 'returnType', {'params':['type', 'name']}]
     for i in utils.data["functions"]:
         output += "todo_{} = 0\n".format((i["name"]))
-        utils.defmap[i["name"]] = i
     
-    for i in utils.data["structs"]:
-        utils.defmap[i["name"]] = i
-        for j in i["fields"]:
-            utils.defmap[i["name"]+"_"+j["name"]] = j
-        
-    for i in utils.data["aliases"]: utils.defmap[i["name"]] = utils.defmap[i["type"]]
-
     for i in utils.data["structs"]:
         output += "class {}:\n".format(i["name"])
 
@@ -131,9 +126,7 @@ class VoidPointer:
 
         accessors = "\n".join([getter_fmt.format(i["name"], j["name"], "", typeValue(j["type"], False, False)) + "\n" + setter_fmt.format(i["name"], j["name"], "val")  for j in i["fields"]])
 
-        output += accessors + "\n"
-        
-
+        output += accessors + "\n"      
 
     # callbacks: ['name', 'description', 'returnType', 'params':['type', 'name']]
     output += "\n# Callbacks:\n"

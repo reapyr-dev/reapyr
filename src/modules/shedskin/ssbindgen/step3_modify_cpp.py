@@ -1,13 +1,23 @@
 import gen_ss_utils as utils
 
+# Helper method to see if a type is basic (int, double, etc.)
 def isBasicType(ctype): return utils.maptype(ctype) in utils.basictypes
 
+typeOverrides = {
+    "char **": ["SStrList", "const char **"],
+    "const char **": ["SStrList", "const char **"]
+}
+
+# Generates code executed when 'getting' a property member of a Struct type
+# We use python getter decorators to simulate property access although it's 
+# actually a method being called.
 def wrapGetType(ctype, val, param):
-    #print ("wrapGetType:", ctype, val)
+
+    if param and ctype in typeOverrides.keys():
+        return "({}){}".format(typeOverrides[ctype][1], val)
+    
     isBasic = isBasicType(ctype)
-    #print ("isBasic:", isBasic)
     isAlist = utils.isList(ctype)
-    #print ("isAlist:", isBasic)
     listType = None
     isFixed = False
     if isAlist:
@@ -17,7 +27,7 @@ def wrapGetType(ctype, val, param):
         else:
             listType = ctype[:-1].strip()
     
-        return wrapGetType(listType, val , param) #+ "[idx]"
+        return wrapGetType(listType, val , param)
     
     if isBasic:
         tmptype = utils.maptype(ctype) 
@@ -30,6 +40,8 @@ def wrapGetType(ctype, val, param):
 
     return formatParam(ctype, val, param)
 
+# Wraps a value returned from a getter method, to convert it from native C type into
+# SS type
 def formatParam(ctype, val, param):
     if param:
         return "&{}".format(val)
@@ -37,10 +49,15 @@ def formatParam(ctype, val, param):
         return "new VoidPointer(/*{}*/)".format(val)
     return "new {}(rlobj={})".format(ctype, val)
 
+# This converts a SS type into a native C type so that it can be passed into function call param.
 def typeParam(ctype, param):
     if isBasicType(ctype):
         if ctype.endswith("char *"):
             return "({}){}->c_str()".format(ctype, param)
+        if ctype == "char":
+            return "({}){}->c_str()[0]".format(ctype, param)
+        if ctype == "...":
+            return "{}->c_str()".format(param)
         return "({}){}".format(ctype, param)
     if not ctype in utils.defmap.keys(): return "NULL"
     elif utils.isList(ctype):
@@ -49,15 +66,35 @@ def typeParam(ctype, param):
         if not ctype.endswith("*"):
             return "*((rlc::{}*){}->rlobj)".format(ctype, param)
         return "(rlc::{}){}->rlobj".format(ctype, param)
+    
 
+# debug helpers here, types get inserted into these lists to bypass them, for situations where
+# big refactoring is happening and needing to reduce API surface for testing while working
+skiptypes_getter = [] 
+skiptypes_setter = []
+skiptypes_returned = []
+skiptypes_params = []
+
+# Enables debugging markers to appear in generated code to help troubleshoot patterns
+ENABLE_DEBUG_STRS=False
+def DEBUG_STR(s):
+    if ENABLE_DEBUG_STRS: return s
+    return ""
+
+# Main entry point for this step.  What this method does is input a C++ file generated
+# from Shedskin that contains a bunch of 'nonfunctional' markers named like 'todo_xyz'.
+# Line by line we read the .cpp file, look for these markers and swap them for actual C++
+# code that invokes the functionality needed to access the 'real' API being wrapped.
 def modify_ss_cpp():
 
     print("Generating C++...")
 
     lines=[]
-    infile = utils.tmp / "raylib.cpp.input"
-    #infile = "D:/dev/vsc_wksp1/raylib-dev01/reapyr/src/examples/hello_reapyr/build/raylib copy.cpp" #raylib copy.cpp
-    #infile = './tmp/ss/raylib.cpp'
+
+    # We work from a temp file, so always starting from
+    # pristine input, making this step repeatable for debugging
+    infile = utils.tmp / "raylib.cpp.input"  
+
     with open(infile, 'r') as f:
         lines = f.readlines() 
 
@@ -65,28 +102,24 @@ def modify_ss_cpp():
 
     skip = 0
     lineIter = iter(lines)
-    print (dir(lineIter))
+
     for line in lineIter:
-        if skip > 0:
-            skip -=1
-            continue
-        #output += "\t\ttodo_return(0)\n"
-        #this->rlobj = todo_create_rlobj(__raylib__::todo_Vector2);
-        if "todo_return(__ss_int(0));" in line: #output += gen_
-            
+        if skip > 0: # skip counter to remove N lines from output
+            skip -= 1
+            continue        
+
+        if "todo_return(__ss_int(0));" in line:            
             output += "\treturn NULL;\n".format(objname)
             continue
 
+        # Example line: this->rlobj = todo_create_rlobj(__raylib__::todo_Vector2);
         if "todo_create_rlobj(__raylib__" in line:
             print ("processing:", line)
-            objname = line.split("::todo_")[1].split(")")[0]
-            
+            objname = line.split("::todo_")[1].split(")")[0]            
             output += "\tthis->rlobj = new rlc::{}();\n".format(objname)
-            #output += "\tvoid* tmp = new rlc::{}();\n".format(objname)
             continue
 
-
-        #todo_getter(__raylib__::todo_Vector2_x);
+        # Example line: todo_getter(__raylib__::todo_Vector2_x);
         if "todo_getter(__raylib__" in line:
             print ("processing:", line)
             ids = line.split("::todo_")[1].split(")")[0].split("_")
@@ -95,43 +128,46 @@ def modify_ss_cpp():
             
             typeVal = "((rlc::{}*)this->rlobj)->{}".format(objdef["name"], fielddef["name"])
 
-            if fielddef["type"] in ["char **", "float[2]"]: continue
-            #output += "\treturn ({});\n".format(wrapGetType(fielddef["type"], typeVal))
+            if fielddef["type"] in skiptypes_getter: continue
+
             nextLine = next(lineIter)
             if not "NULL" in nextLine: 
                 output += "\treturn {};\n".format(wrapGetType(fielddef["type"], typeVal, False))
             else:
                 output += nextLine.replace("NULL)", wrapGetType(fielddef["type"], typeVal, True)+ ")") 
-            #skip = 1
+
             continue
-        #todo_setter(__raylib__::todo_Ray_position);
+
+        # Example line: todo_setter(__raylib__::todo_Ray_position);
         if "todo_setter(__raylib__" in line:
             ids = line.split("::todo_")[1].split(")")[0].split("_")
             objdef = utils.defmap[ids[0]]
             fielddef = utils.defmap[ids[0]+"_"+ids[1]]
             suffix = ""
-            #if utils.isList(fielddef["type"]):
-            #    suffix = "[idx]"
-            #bt = utils.baseType(fielddef["type"])
+
             bt = fielddef["type"]
             mt = utils.maptype(utils.baseType(fielddef["type"]))
-            output += "\t// debug:" + str([fielddef["type"], isBasicType(bt), bt, mt]) + "\n"
+            output += DEBUG_STR("\t// debug:" + str([fielddef["type"], isBasicType(bt), bt, mt]) + "\n")
             casttype = fielddef["type"]
             if utils.isList(fielddef["type"]) and casttype.endswith("*"): casttype = casttype[0:-1].strip()
             castsuffix=""
             if "[" in casttype: casttype = casttype.split("[")[0].strip()
-            if bt in ["char **", "float[2]", "Matrix[2]", "float[4]", "Transform **", "void *"]: continue
+            if bt in skiptypes_setter: continue
+
             if isBasicType(bt) or mt == "VoidPointer":
-                #fielddef["type"]
-                output += "\t// debug:" + str(["case1"]) + "\n"
+                output += DEBUG_STR("\t// debug:" + str(["case1"]) + "\n")
                 cast = "({})".format(casttype)
                 valsuffix = ""
 
                 if mt == "str" and "[" in fielddef["type"]:
                     output += "\trlconvertStringFixed(val, ((rlc::{0}*)this->rlobj)->{1}{2});\n".format(objdef["name"], fielddef["name"], suffix)
                     continue
+                
 
-                if bt == "str":
+                if bt in typeOverrides.keys():
+                    valsuffix = "->ptr"
+                    cast = "({})".format(bt)
+                elif bt == "str":
                     valsuffix = "->unit.c_str()"
                     cast = "(char*)"
                 
@@ -144,23 +180,32 @@ def modify_ss_cpp():
 
                 output += "\t((rlc::{0}*)this->rlobj)->{1}{3} = {2}val{4};\n".format(objdef["name"], fielddef["name"], cast, suffix, valsuffix)
             else:
-                output += "\t// debug:" + str(["case2"]) + "\n"
+                output += DEBUG_STR("\t// debug:" + str(["case2"]) + "\n")
                 if casttype.endswith("**"): casttype = casttype[0:-1]
                 cast=""
                 if utils.isList(fielddef["type"]) and isBasicType(utils.baseType(fielddef["type"])):
-                    output += "\t// debug:" + str(["case2.2 hmm"]) + "\n"
+                    output += DEBUG_STR("\t// debug:" + str(["case2.2 hmm"]) + "\n")
+                    if "[" in fielddef["type"]:
+                        ct = fielddef["type"].split("[")[0]
+                        listSize = int(fielddef["type"].split("[")[1][:-1])
+                        output += "\tconvertListFixed<{3}>(val->ptr, ((rlc::{0}*)this->rlobj)->{1}{2}, {4});\n".format(objdef["name"], fielddef["name"], suffix, ct, listSize)
+                        continue
                     cast = "({})val->ptr".format(fielddef["type"])
                 else:
                     cast = "(rlc::{})val->rlobj".format(fielddef["type"])
                     if not fielddef["type"].strip().endswith("*"):
-                        output += "\t// debug:" + str(["case2.3", casttype]) + "\n"
+                        output += DEBUG_STR("\t// debug:" + str(["case2.3", casttype]) + "\n")
                         cast = "*((rlc::{}*)val->rlobj)".format(casttype)
+                    if "[" in fielddef["type"]:
+                        base = utils.baseType(fielddef["type"])
+                        ct = fielddef["type"].split("[")[0]
+                        listSize = int(fielddef["type"].split("[")[1][:-1])
+                        output += "\tconvertListFixed<rlc::{3}>((rlc::{3}*)val->rlobj, ((rlc::{0}*)this->rlobj)->{1}{2}, {4});\n".format(objdef["name"], fielddef["name"], suffix, ct, listSize)
+                        continue
+
                 output += "\t((rlc::{0}*)this->rlobj)->{1}{3} = {2};\n".format(objdef["name"], fielddef["name"], cast, suffix)
             continue
         
-        #todo_c_implementation_here(__raylib__::todo_GetGestureDragVector);
-        #return (new Vector2(default_1, default_2, NULL));
-
         if "todo_c_implementation_here(__raylib__" in line:
             func = line.split("::todo_")[1].split(")")[0].strip()
             funcdef = utils.defmap[func]
@@ -175,16 +220,16 @@ def modify_ss_cpp():
                         output += "\t//skipping due to param " + j["name"] + " having unsupported type " + j["type"] + "\n"
                         doSkip=True
             '''
-            output += "\t//Debug: "+ str([funcdef]) + "\n"
-            output += "\t//Debug: "+ str([rt, utils.maptype(rt), utils.calctype(rt)]) + "\n"
-            if rt in [ "char **", "const char **"]: doSkip = True
+            output += DEBUG_STR("\t//Debug: "+ str([funcdef]) + "\n")
+            output += DEBUG_STR("\t//Debug: "+ str([rt, utils.maptype(rt), utils.calctype(rt)]) + "\n")
+
+            if rt in skiptypes_returned : doSkip = True
+
             if "params" in funcdef.keys():
                 for j in funcdef["params"]:
-                    if j["type"] in ["...", "char **"]: doSkip=True
+                    if j["type"] in skiptypes_params: doSkip=True
+
             if doSkip:
-                #nextLine = next(lineIter)
-                #output += "\treturn NULL;\n"
-                #output += nextLine
                 continue
             else:
                 suffix = ""
@@ -222,13 +267,9 @@ def modify_ss_cpp():
         output += gen_prologue(line)
 
     outfile = utils.tmp / "raylib.cpp"
-    #outfile = "D:/dev/vsc_wksp1/raylib-dev01/reapyr/src/examples/hello_reapyr/build/raylib.cpp"
-    #outfile = "./tmp/ss/raylib.cpp.modified"
+
     with open(outfile, 'w') as f:
         f.write(output)
-
-    #print (maptype("char **"))
-    #print (baseType("char **"))
 
 def gen_prologue(line):
     output = ""
@@ -255,6 +296,11 @@ char* rlconvertStringFixed(str* input, char* output) {
     }
     output[n]=0;
     return output;
+}
+
+template <class T> void convertListFixed(T* input, T* output, int size) {
+    for (int i = 0; i < size; i++)
+        output[i] = input[i];
 }
 
 list<__ss_float> * convertList (float * buffer) {

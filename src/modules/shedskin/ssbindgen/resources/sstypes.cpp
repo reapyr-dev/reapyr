@@ -17,6 +17,7 @@ class_ *cl_SSFloatPtr;
 class_ *cl_SSDoublePtr;
 class_ *cl_SSCharPtr;
 class_ *cl_SSUCharPtr;
+class_ *cl_SSStrList;
 
 SSFloatPtr* makeFloatPtr() {return new SSFloatPtr(new float[1024]);}
 
@@ -34,6 +35,7 @@ void __init() {
     cl_SSDoublePtr = new class_("SSDoublePtr");
     cl_SSCharPtr = new class_("SSCharPtr");
     cl_SSUCharPtr = new class_("SSUCharPtr");
+    cl_SSStrList = new class_("SSStrList");
     //print(2, NULL, NULL, NULL, const_0, inferAll());
 }
 
