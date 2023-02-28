@@ -53,6 +53,11 @@ typeOverrides = {
     "const char **": "SSStrList"
 }
 
+def mapReturnType(ctype):
+    if ctype in typeOverrides.keys():
+        return typeOverrides[ctype]
+    return utils.maptype(ctype)
+
 # Returns 'default' consts or values for any type. Used to trigger Shedskin inferencing
 def typeValue(ctype, apiParam, classParam):
     if ctype in typeOverrides.keys():
@@ -151,7 +156,7 @@ from sstypes import *
 
     # 'functions': ['name', 'description', 'returnType', 'params':['type', 'name']]
     for i in utils.data["functions"]:
-        ret = utils.maptype(i["returnType"])
+        ret = mapReturnType(i["returnType"])
 
         outparams = ", ".join(["{}: {}".format(utils.pyname(j["name"]), utils.maptype(j["type"])) for j in i["params"]]) if "params" in i.keys() else ""
         output += "def {} ({}) -> {}:\n".format(i["name"], outparams,  ret)
