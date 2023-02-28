@@ -8,6 +8,9 @@ if ! grep -q raygui $REAPYR_SDK_ROOT/deps/raylib/src/CMakelists.txt; then
   echo "Applied patch"
 fi
 
+# 'install' the raygui header
+cp $REAPYR_SDK_ROOT/deps/raygui/src/raygui.h $REAPYR_SDK_ROOT/deps/installed/include/
+
 # Setup for cmake
 cd $REAPYR_SDK_ROOT/deps/raylib
 mkdir -p build

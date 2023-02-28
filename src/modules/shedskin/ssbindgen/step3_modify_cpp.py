@@ -45,8 +45,8 @@ def wrapGetType(ctype, val, param):
 def formatParam(ctype, val, param):
     if param:
         return "&{}".format(val)
-    if ctype == "void **" or ctype == "void *" or utils.maptype(ctype) == "VoidPointer":
-        return "new VoidPointer(/*{}*/)".format(val)
+    if ctype == "void **" or ctype == "void *" or utils.maptype(ctype) == "VoidPtr":
+        return "new VoidPtr({})".format(val)
     return "new {}(rlobj={})".format(ctype, val)
 
 # This converts a SS type into a native C type so that it can be passed into function call param.
@@ -59,13 +59,23 @@ def typeParam(ctype, param):
         if ctype == "...":
             return "{}->c_str()".format(param)
         return "({}){}".format(ctype, param)
-    if not ctype in utils.defmap.keys(): return "NULL"
-    elif utils.isList(ctype):
-        return "{}".format(param)
+    usetype = ctype
+    if usetype.startswith("const"):
+        usetype = usetype[6:]
+    if utils.isList(usetype) and not usetype in utils.defmap.keys():
+        if usetype.endswith("**"): usetype=usetype[:-1]
+        if utils.baseType(usetype) in utils.defmap.keys():
+            if ctype.startswith("const"):
+                return "(const rlc::{}){}->rlobj".format(ctype[6:], param)
+            
+            return "(rlc::{}){}->rlobj".format(ctype, param)
+        return "({}){}->ptr".format(ctype, param)
+    elif not usetype in utils.defmap.keys(): 
+        return "NULL"
     else:
-        if not ctype.endswith("*"):
-            return "*((rlc::{}*){}->rlobj)".format(ctype, param)
-        return "(rlc::{}){}->rlobj".format(ctype, param)
+        if not usetype.endswith("*"):
+            return "*((rlc::{}*){}->rlobj)".format(usetype, param)
+        return "(rlc::{}){}->rlobj".format(usetype, param)
     
 
 # debug helpers here, types get inserted into these lists to bypass them, for situations where
@@ -76,7 +86,7 @@ skiptypes_returned = []
 skiptypes_params = []
 
 # Enables debugging markers to appear in generated code to help troubleshoot patterns
-ENABLE_DEBUG_STRS=False
+ENABLE_DEBUG_STRS=True
 def DEBUG_STR(s):
     if ENABLE_DEBUG_STRS: return s
     return ""
@@ -154,7 +164,7 @@ def modify_ss_cpp():
             if "[" in casttype: casttype = casttype.split("[")[0].strip()
             if bt in skiptypes_setter: continue
 
-            if isBasicType(bt) or mt == "VoidPointer":
+            if isBasicType(bt) or mt == "VoidPtr":
                 output += DEBUG_STR("\t// debug:" + str(["case1"]) + "\n")
                 cast = "({})".format(casttype)
                 valsuffix = ""
@@ -171,8 +181,8 @@ def modify_ss_cpp():
                     valsuffix = "->unit.c_str()"
                     cast = "(char*)"
                 
-                if mt == "VoidPointer":
-                    valsuffix = "->val"
+                if mt == "VoidPtr":
+                    valsuffix = "->ptr"
                     if fielddef["type"] == "void *":
                         cast = "(void *)"
                     else:
@@ -240,7 +250,7 @@ def modify_ss_cpp():
                     else:
                         ret = "rlc::{0}* result = new rlc::{0}(); *result = ".format(rt)
                 
-                params = ", ".join([typeParam(j["type"], j["name"]) for j in funcdef["params"]]) if "params" in funcdef.keys() else ""
+                params = ", ".join([typeParam(j["type"], utils.pyname(j["name"])) for j in funcdef["params"]]) if "params" in funcdef.keys() else ""
                 callfunc = "\t{}rlc::{}({}){};\n".format(ret, func, params, "")                
 
                 output += callfunc
@@ -250,7 +260,7 @@ def modify_ss_cpp():
                         if utils.maptype(rt) == "str":
                             output += "\treturn new str(result);\n"
                         elif rt=="void *":
-                            output += "\treturn new VoidPointer(/*result*/);\n"
+                            output += "\treturn new VoidPtr(result);\n"
                         elif utils.isList(rt):
                             output += "\treturn convertList(result);\n"
                         else:
@@ -278,6 +288,9 @@ def gen_prologue(line):
 
 namespace rlc {
     #include <raylib.h>
+    #include <raymath.h>
+    #include <rlgl.h>
+    #include <raygui.h>
 }
             """
         # Have to undefine C globals or they clash with

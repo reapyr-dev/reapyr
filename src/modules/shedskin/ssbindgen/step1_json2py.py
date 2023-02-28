@@ -88,9 +88,6 @@ def gen_ss_py():
 
 from sstypes import *
 
-class VoidPointer:
-    def __init__(self, val=int(0)):
-        self.val = val
 """
     output += prologue
 
@@ -156,7 +153,7 @@ class VoidPointer:
     for i in utils.data["functions"]:
         ret = utils.maptype(i["returnType"])
 
-        outparams = ", ".join(["{}: {}".format(j["name"], utils.maptype(j["type"])) for j in i["params"]]) if "params" in i.keys() else ""
+        outparams = ", ".join(["{}: {}".format(utils.pyname(j["name"]), utils.maptype(j["type"])) for j in i["params"]]) if "params" in i.keys() else ""
         output += "def {} ({}) -> {}:\n".format(i["name"], outparams,  ret)
 
         output += '\ttodo_c_implementation_here(todo_{})\n'.format((i["name"]))

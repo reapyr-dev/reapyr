@@ -14,11 +14,33 @@ fsroot_modules = fsroot / "src/modules"
 
 def posix_path(s): return str(PurePosixPath(s)).replace("\\", "")
 
+def merge_json():
+    files= ["raylib", "rlgl", "raymath",  "raygui"]
+
+    merged= {
+        'defines':   [],
+        'structs':   [],
+        'aliases':   [],
+        'enums':     [],
+        'callbacks': [],
+        'functions': []
+    }
+
+    for file in files:
+        with open(fsroot_modules / f"cpython/cpygen/tmp/{file}.h.json") as f:  
+            data = json.load(f)
+            for key in ["defines", "structs", "aliases", "enums", "callbacks", "functions"]:
+                merged[key].extend(data[key])
+
+    return merged
+
 def load_json():
     global data, aliases, typemap
 
-    with open(fsroot_modules / "cpython/cpygen/tmp/raylib.h.json") as f:  
-        data = json.load(f)
+    #with open(fsroot_modules / "cpython/cpygen/tmp/raylib.h.json") as f:  
+    #    data = json.load(f)
+
+    data = merge_json()
     
     # Aliases store 'alternate' names for symbols. We'll store these
     # So that if any are encountered we can swap for the 'real' name
@@ -50,8 +72,9 @@ sstypemap = {
 
 typemap = {
     "float *": "FloatList",
+    "const float *": "FloatList",
     "unsigned char *": "IntList",
-    "const unsigned char *": "VoidPointer",
+    "const unsigned char *": "VoidPtr",
     "char *": "str",
     "const char *": "str",
     "char **": "StrList",
@@ -59,16 +82,16 @@ typemap = {
     "unsigned int *": "IntList",
     "int *": "IntList",
     "const int *": "IntList",    
-    "void *": "VoidPointer",
+    "void *": "VoidPtr",
 
     "double": "float",
     "unsigned char": "int",
     "unsigned int": "int",
     "unsigned short": "int",
-    "rAudioBuffer *": "VoidPointer",
-    "rAudioProcessor *": "VoidPointer",
+    "rAudioBuffer *": "VoidPtr",
+    "rAudioProcessor *": "VoidPtr",
     "void": "None",
-    "va_list": "VoidPointer",
+    "va_list": "VoidPtr",
     "long": "int",
     "...": "StrList",
     "char": "str",
@@ -104,6 +127,7 @@ def calctype(t):
 
 ptrs = {
     "float": "SSFloatPtr", 
+    "const float": "SSFloatPtr", 
     "double": "SSDoublePtr", 
     "int": "SSIntPtr", 
     "unsigned int": "SSUIntPtr", 
@@ -160,6 +184,14 @@ aliases={}
 def copyfiles(fileList, fromfolder, tofolder):
     for f in fileList:
         shutil.copyfile(fromfolder / f, tofolder / f)
+
+pynames = {
+    "from": "from_"
+}
+
+def pyname(n):
+    if n in pynames.keys(): return pynames[n]
+    return n
 
 
 
