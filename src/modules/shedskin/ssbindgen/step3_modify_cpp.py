@@ -86,7 +86,7 @@ skiptypes_returned = []
 skiptypes_params = []
 
 # Enables debugging markers to appear in generated code to help troubleshoot patterns
-ENABLE_DEBUG_STRS=True
+ENABLE_DEBUG_STRS=False
 def DEBUG_STR(s):
     if ENABLE_DEBUG_STRS: return s
     return ""
