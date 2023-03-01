@@ -215,6 +215,36 @@ def modify_ss_cpp():
 
                 output += "\t((rlc::{0}*)this->rlobj)->{1}{3} = {2};\n".format(objdef["name"], fielddef["name"], cast, suffix)
             continue
+
+        if "todo_getitem(__raylib__::" in line:
+            # todo_getitem(__raylib__::todo_Vector2);
+            # return (new Vector2(__ss_float(0.0), __ss_float(0.0), NULL));
+            objdef = utils.defmap[line.split("::todo_")[1].split(")")[0]]
+            retval = f"((rlc::{objdef['name']}*)this->rlobj)+i"
+            nextLine = next(lineIter)
+            output += nextLine.replace("NULL)", f"{retval})")
+            continue
+
+        if "todo_setitem(__raylib__::" in line:
+            # todo_setitem(__raylib__::todo_Vector4);
+            objdef = utils.defmap[line.split("::todo_")[1].split(")")[0]]           
+            output += f"\t((rlc::{objdef['name']}*)this->rlobj)[key] = *((rlc::{objdef['name']}*)val->rlobj);\n"
+            continue
+
+        if "todo_fromlist(__raylib__::" in line:
+            #    todo_fromlist(__raylib__::todo_Vector4);
+            #return (new Vector4(__ss_float(0.0), __ss_float(0.0), __ss_float(0.0), __ss_float(0.0), NULL));
+            #template<class PyType, class RlType> BufferType* makeFromBuffer(list<PyType> *data)
+            objdef = utils.defmap[line.split("::todo_")[1].split(")")[0]]
+
+            retval = f"makeFromBuffer<{objdef['name']}, rlc::{objdef['name']}>(data)"
+
+            nextLine = next(lineIter)
+            output += nextLine.replace("NULL)", f"{retval})")
+            continue
+        
+        
+        
         
         if "todo_c_implementation_here(__raylib__" in line:
             func = line.split("::todo_")[1].split(")")[0].strip()
@@ -316,8 +346,12 @@ template <class T> void convertListFixed(T* input, T* output, int size) {
         output[i] = input[i];
 }
 
-list<__ss_float> * convertList (float * buffer) {
-    return new list<__ss_float>;
+template<class PyType, class RlType> RlType* makeFromBuffer(list<PyType*> *data) {
+    RlType* buf = new RlType[data->units.size()];
+    for (int i=0; i<data->units.size(); i++) {
+        buf[i] = *((RlType*)(data->units[i]->rlobj));
+    }
+    return buf;
 }
 
 """    

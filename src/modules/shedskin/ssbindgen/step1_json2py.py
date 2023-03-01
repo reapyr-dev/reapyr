@@ -99,6 +99,9 @@ from sstypes import *
     output += "def todo_create_rlobj(val): pass\n"
     output += "def todo_setter(val): pass\n"
     output += "def todo_getter(val): pass\n"
+    output += "def todo_getitem(val): pass\n"
+    output += "def todo_setitem(val): pass\n"
+    output += "def todo_fromlist(val): pass\n"
     output += "def todo_c_implementation_here(val): pass\n"
     output += "def todo_return(val): pass\n"
 
@@ -128,7 +131,11 @@ from sstypes import *
 
         accessors = "\n".join([getter_fmt.format(i["name"], j["name"], "", typeValue(j["type"], False, False)) + "\n" + setter_fmt.format(i["name"], j["name"], "val")  for j in i["fields"]])
 
-        output += accessors + "\n"      
+        output += accessors + "\n"
+
+        output += f"\n\tdef __getitem__(self, i): todo_getitem(todo_{i['name']}); return {i['name']}()\n"
+        output += f"\tdef __setitem__(self, key, val):  todo_setitem(todo_{i['name']})\n"
+        output += f"\t@staticmethod\n\tdef fromList(data): todo_fromlist(todo_{i['name']}); return {i['name']}()\n\n"
 
     # callbacks: ['name', 'description', 'returnType', 'params':['type', 'name']]
     output += "\n# Callbacks:\n"
@@ -166,8 +173,7 @@ from sstypes import *
         if ret == "None":
             output += "\treturn\n"
         else:
-            output += "\treturn {}\n".format(typeValue((i["returnType"]), True, False))
-        
+            output += "\treturn {}\n".format(typeValue((i["returnType"]), True, False))        
 
     output += "\n# Invoke all to force shedskin to generate C++ for them\n"
 
@@ -177,6 +183,9 @@ from sstypes import *
     for i in utils.data["structs"]:
         params = ", ".join(["{} = {}".format(j["name"], typeValue(j["type"], True, False)) for j in i["fields"]])
         output += "\ttemp{0} = {0}({1})\n".format(i["name"], params)
+        output += f"\ttemp{i['name']}[0] = temp{i['name']}\n"
+        output += f"\ttemp{i['name']}[1] = {i['name']}.fromList([temp{i['name']}])\n"
+        output += f"\ttemp{i['name']} = temp{i['name']}[0]\n"
         output += "\n".join(["\ttemp{0}_{1}=temp{0}.{1}".format(i["name"], j["name"]) for j in i["fields"]]) + "\n\n"
         output += "\n".join(["\ttemp{0}.{1}={2}".format(i["name"], j["name"], typeValue(j["type"], True, False)) for j in i["fields"]]) + "\n\n"
 
@@ -191,4 +200,4 @@ from sstypes import *
     with open(outfile, 'w') as f:
         f.write(output)
 
-    
+if __name__ == "__main__": gen_ss_py()
