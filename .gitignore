@@ -225,14 +225,14 @@ cython_debug/
 # --------------------------------------------------
 
 # Ignore submodules changes
-deps/bdwgc
-deps/installed
-deps/libatomic_ops
-deps/libpcre
-deps/raygui
-deps/raylib
-deps/raylibpyctbg
-deps/shedskin
+deps/bdwgc/
+deps/installed/
+deps/libatomic_ops/
+deps/libpcre/
+deps/raygui/
+deps/raylib/
+deps/raylibpyctbg/
+deps/shedskin/
 
 build
 tmp
