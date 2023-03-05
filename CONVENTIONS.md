@@ -1,26 +1,26 @@
-## Python API Coding Style Conventions
+## C API Coding Style Conventions
 
-Here is a list with some code conventions used by raylib in python:
+Here is a list with some code conventions used by reapyr in python:
 
-| Code element        |            Convention             | Example                                   |
-|---------------------|:---------------------------------:|-------------------------------------------|
-| Variables           |            lower_case             | `delta_time = 0`, `player_age = 18`       |
-| Local variables     |            lower_case             | `player_position = Vector2(0, 0)`         |
-| Global variables    |            lower_case             | `window_ready = False`                    |
-| Constants variables |             ALL_CAPS              | `MAX_VALUE = 8`, `SCREEN_WIDTH = 800`     |
-| Definitions values  |             ALL_CAPS              | `MAX_BUILDINGS = 5`[^1]                   |
-| string values       |       always ' ' or " "[^2]       | `output = "Hello"`, `'welcome'`[^3]       |
-| float values        |            always x.x             | `gravity = 10.0`                          |
-| Operators           |          value1 * value2          | `product = value * 6`                     |
-| Operators           |          value1 / value2          | `division = value / 4`                    |
-| Operators           |          value1 + value2          | `sum = value + 10`                        |
-| Operators           |          value1 - value2          | `res = value - 5`                         |
-| Class               |             TitleCase             | `class TextureFormat`                     |
-| Enum Class members  |             ALL_CAPS              | `PIXELFORMAT_UNCOMPRESSED_R8G8B8`         |
-| Class members       |             lowerCase             | `texture.width`, `color.r`                |
-| Functions           |   lowerCase & wordSeparationBy_   | `init_window()`, `update_camera_center()` |
-| Functions params    |             lowerCase             | `width`, `height`                         |
-| Ternary Operator    | result1 if condition else result2 | `print("yes" if value == 0 else "no")`    |
+| Code element        |            Convention             | Example                                |
+|---------------------|:---------------------------------:|----------------------------------------|
+| Variables           |            lower_case             | `delta_time = 0`, `player_age = 18`    |
+| Local variables     |            lower_case             | `player_position = Vector2(0, 0)`      |
+| Global variables    |            lower_case             | `window_ready = False`                 |
+| Constants variables |             ALL_CAPS              | `MAX_VALUE = 8`, `SCREEN_WIDTH = 800`  |
+| Definitions values  |             ALL_CAPS              | `MAX_BUILDINGS = 5`[^1]                |
+| string values       |       always ' ' or " "[^2]       | `output = "Hello"`, `'welcome'`[^3]    |
+| float values        |            always x.x             | `gravity = 10.0`                       |
+| Operators           |          value1 * value2          | `product = value * 6`                  |
+| Operators           |          value1 / value2          | `division = value / 4`                 |
+| Operators           |          value1 + value2          | `sum = value + 10`                     |
+| Operators           |          value1 - value2          | `res = value - 5`                      |
+| Class               |             TitleCase             | `class TextureFormat`                  |
+| Enum Class members  |             ALL_CAPS              | `PIXELFORMAT_UNCOMPRESSED_R8G8B8`      |
+| Class members       |             lowerCase             | `texture.width`, `color.r`             |
+| Functions           |             camelCase             | `InitWindow()`                         |
+| Functions params    |             lowerCase             | `width`, `height`                      |
+| Ternary Operator    | result1 if condition else result2 | `print("yes" if value == 0 else "no")` |
 
 [^1] like `macro definitions` of value in C
 
@@ -32,7 +32,7 @@ to convert string object to bytes object use or b"..." or "...".encode('uft-8')
 Some other conventions to follow:
 
 - **ALWAYS** initialize all defined variables.
-- **Use Spaces** for intentation.
+- **Use 4 Spaces** for indentation.
 - Avoid trailing spaces, please, avoid them
 - Avoid using **semicolon** as you can
 - Control flow statements always are followed **by a space**:
@@ -40,7 +40,7 @@ Some other conventions to follow:
 ```python
 if condition : value = 0
 
-while not window_should_close():
+while not WindowShouldClose():
     #Do something here!
 
 for i in range(NUM_VALUES): print(i)
@@ -168,15 +168,15 @@ def main():
     SCREEN_WIDTH = 800
     SCREEN_HEIGHT = 450
 
-    init_window(SCREEN_WIDTH, SCREEN_HEIGHT, "raylib [core] example - basic window")
+    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "raylib [core] example - basic window")
 
     # TODO: Load resources / Initialize variables at this point
 
-    set_target_fps(60)  # Set our game to run at 60 frames-per-second
+    SetTargetFPS(60)  # Set our game to run at 60 frames-per-second
     # ------------------------------------------------------------------------------------
 
     # Main game loop
-    while not window_should_close():  # Detect window close button or ESC key
+    while not WindowShouldClose():  # Detect window close button or ESC key
         # Update
         # ----------------------------------------------------------------------------------
         # TODO: Update variables / Implement example logic at this point
@@ -184,12 +184,12 @@ def main():
 
         # Draw
         # ----------------------------------------------------------------------------------
-        begin_drawing()
+        BeginDrawing()
 
-        clear_background(RAYWHITE)
-        draw_text(b"Congrats! You created your first window!", 190, 200, 20, LIGHTGRAY)
+        ClearBackground(RAYWHITE)
+        DrawText("Congrats! You created your first window!", 190, 200, 20, LIGHTGRAY)
 
-        end_drawing()
+        EndDrawing()
         # ----------------------------------------------------------------------------------
 
     # De-Initialization
@@ -197,7 +197,7 @@ def main():
 
     # TODO: Unload all loaded resources at this point
 
-    close_window()  # Close window and OpenGL context
+    CloseWindow()  # Close window and OpenGL context
     # ----------------------------------------------------------------------------------
 
 
