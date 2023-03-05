@@ -54,15 +54,15 @@ cd reapyr/src/modules/quickstart
 
 Test a CPython example:
 ```[bash]
-cd ../../examples/raylib/hello_raylib/
-python ./hello_raylib.py
+cd ../../examples/core/
+python ./core_basic_window.py
 ```
 You should see a Raylib window open up with the text: *'You created your first window!'*
 
 Next, run an included script that converts the same example to C++ via Shedskin and runs it:
 
 ```[bash]
-ssrun ./hello_raylib.py
+ssrun ./core_basic_window.py
 ```
 
 That's it! After the last command you'll see the same result as when run with ```python```, but behind the scenes ```ssrun``` actually converted *all* the code to C++, compiled it, and ran an executable!
