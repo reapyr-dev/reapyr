@@ -4,7 +4,7 @@ raylib [core] example - Basic Window
 
 """
 
-from raylib import *
+import raylib
 
 
 # ------------------------------------------------------------------------------------
@@ -16,15 +16,15 @@ def main():
     SCREEN_WIDTH = 800
     SCREEN_HEIGHT = 450
 
-    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "raylib [core] example - basic window")
+    raylib.InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "raylib [core] example - basic window")
 
     # TODO: Load resources / Initialize variables at this point
 
-    SetTargetFPS(60)  # Set our game to run at 60 frames-per-second
+    raylib.SetTargetFPS(60)  # Set our game to run at 60 frames-per-second
     # ------------------------------------------------------------------------------------
 
     # Main game loop
-    while not WindowShouldClose():  # Detect window close button or ESC key
+    while not raylib.WindowShouldClose():  # Detect window close button or ESC key
         # Update
         # ----------------------------------------------------------------------------------
         # TODO: Update variables / Implement example logic at this point
@@ -32,12 +32,12 @@ def main():
 
         # Draw
         # ----------------------------------------------------------------------------------
-        BeginDrawing()
+        raylib.BeginDrawing()
 
-        ClearBackground(RAYWHITE)
-        DrawText("Congrats! You created your first window!", 190, 200, 20, LIGHTGRAY)
+        raylib.ClearBackground(raylib.RAYWHITE)
+        raylib.DrawText("Congrats! You created your first window!", 190, 200, 20, raylib.LIGHTGRAY)
 
-        EndDrawing()
+        raylib.EndDrawing()
         # ----------------------------------------------------------------------------------
 
     # De-Initialization
@@ -45,7 +45,7 @@ def main():
 
     # TODO: Unload all loaded resources at this point
 
-    CloseWindow()  # Close window and OpenGL context
+    raylib.CloseWindow()  # Close window and OpenGL context
     # ----------------------------------------------------------------------------------
 
 
