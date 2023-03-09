@@ -15,7 +15,7 @@ thisFilePath = Path(os.path.realpath(__file__))
 reapyrRoot = thisFilePath.parents[3]
 
 script = f"""
-export PYTHONPATH="{posix(reapyrRoot / 'src' / 'modules' / 'cpython' / 'lib')};{posix(reapyrRoot / 'deps' / 'shedskin')}"
+export PYTHONPATH="{posix(reapyrRoot / 'src' / 'modules' / 'cpython' / 'lib')}{os.pathsep}{posix(reapyrRoot / 'deps' / 'shedskin')}"
 export PATH=$PATH:{posix(reapyrRoot / 'src' / 'modules' / 'quickstart')}
 export REAPYR_SDK_ROOT={posix(reapyrRoot)}
 bash

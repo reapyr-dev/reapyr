@@ -2,6 +2,7 @@ unameOut="$(uname -s)"
 machine="UNKNOWN:${unameOut}"
 maketype=""
 libext="so"
+ibin="lib"
 case "${unameOut}" in
     Linux*)     
       machine=Linux
@@ -16,6 +17,7 @@ case "${unameOut}" in
       machine=MinGw
       maketype="-G MinGW Makefiles"
       libext="dll"
+      ibin="bin"
       ;;
 esac
 
@@ -65,7 +67,7 @@ cmake --install .
 
 # Copy Raylib DLL to a folder that CPython ctypes lib will be able to find 
 mkdir -p $REAPYR_SDK_ROOT/src/modules/cpython/lib/bin/64bit
-cp $REAPYR_SDK_ROOT/deps/installed/bin/libraylib.$libext $REAPYR_SDK_ROOT/src/modules/cpython/lib/bin/64bit/raylib.$libext
+cp $REAPYR_SDK_ROOT/deps/installed/$ibin/libraylib.$libext $REAPYR_SDK_ROOT/src/modules/cpython/lib/bin/64bit/raylib.$libext
 
 # Generate CPython code, which uses ctypes lib to invoke Raylib's C APIs from a DLL
 cd $REAPYR_SDK_ROOT/src/modules/cpython/cpygen
