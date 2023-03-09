@@ -28,7 +28,7 @@ In the meantime please expect things to probably crash/burn/explode/etc. or plai
 
 2. Download and install [cmake](https://cmake.org/download/) (click link for download location.) Open the w64devkit shell and ensure the 'cmake' command works before proceeding.  If it doesn't work you may need to add cmake.exe to your Windows system path.
 
-3. Extract the zip from previous step, open a command prompt on your PC, and run the w64devkit.exe file from the install folder. This will drop you into a bash shell. This shell lets you work in a much more portable way. (This shell is much better than the Windows default. It also allows you to work in a way that is maximally compatible with most other major OS's and platforms).
+3. Extract the w64devkit zip from step 1, open a command prompt on your PC, and run the w64devkit.exe file from the install folder. This will drop you into a bash shell. This shell lets you work in a much more portable way. (This shell is much better than the Windows default. It also allows you to work in a way that is maximally compatible with most other major OS's and platforms).
 
 4. Once in a bash shell, go to a suitable folder where you'll download and install the Reapyr SDK. Create a new folder if needed, such as via:  ```mkdir mydevfolder && cd mydevfolder```
 
@@ -48,6 +48,7 @@ Run ```setenv.sh``` first, as initializes lots of environment variables that Rea
 
 ```[bash]
 cd reapyr/src/modules/quickstart
+chmod +x *.sh
 ./setenv
 ./build_deps
 ```
@@ -62,7 +63,7 @@ You should see a Raylib window open up with the text: *'You created your first w
 Next, run an included script that converts the same example to C++ via Shedskin and runs it:
 
 ```[bash]
-ssrun ./core_basic_window.py
+ssrun.sh ./core_basic_window.py
 ```
 
-That's it! After the last command you'll see the same result as when run with ```python```, but behind the scenes ```ssrun``` actually converted *all* the code to C++, compiled it, and ran an executable!
+That's it! After the last command you'll see the same result as when run with ```python```, but behind the scenes ```ssrun.sh``` actually converted *all* the code to C++, compiled it, and ran an executable!
