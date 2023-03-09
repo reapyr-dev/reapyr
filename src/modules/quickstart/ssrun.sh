@@ -1,13 +1,24 @@
 #/bin/bash
 
+unameOut="$(uname -s)"
+mext=".linux"
+bext=""
+case "${unameOut}" in
+    MINGW*)     
+      mext=".mingw"
+      bext=".exe"
+      ;;
+esac
+
+
 fullfile=$1
 filename=$(basename -- "$fullfile")
 filename="${filename%.*}"
 
 echo 'Shedding some skin...'
 
-python -m shedskin translate --flags=${REAPYR_SDK_ROOT}/src/modules/shedskin/ssbindgen/resources/FLAGS.reapyr --outputdir=./build/ $1
+$PYCMD -m shedskin translate --flags=${REAPYR_SDK_ROOT}/src/modules/shedskin/ssbindgen/resources/FLAGS.reapyr$mext --outputdir=./build/ $1
 
 make -f ./build/Makefile
-
-./${filename}.exe
+bin="$filename$bext"
+./${bin}

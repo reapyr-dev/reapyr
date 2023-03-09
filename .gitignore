@@ -238,3 +238,4 @@ build
 tmp
 src/modules/cpython/lib/raylib.py
 src/modules/quickstart/_setvars.sh
+src/modules/shedskin/ssbindgen/temp_main

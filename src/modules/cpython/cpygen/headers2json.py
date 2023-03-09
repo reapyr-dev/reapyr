@@ -113,12 +113,14 @@ def preprocess():
         open(outHeader, "w").write(output)
 
 def runparser():
+    binary = "a.out"
+    if Path(folder / "a.exe").is_file(): binary = "a.exe"
     os.system(f"gcc {root/'deps/raylib/parser/raylib_parser.c'}")
     idx = 0
     for i in headers:
         out_header = tmp / f"{i.name}.preprocessed"
         out_json = tmp / f"{i.name}.json"
-        os.system(f"a.exe --input {out_header} --output {out_json} --format JSON {params[idx]}")
+        os.system(f"{folder / binary} --input {out_header} --output {out_json} --format JSON {params[idx]}")
         idx += 1
 
 preprocess()

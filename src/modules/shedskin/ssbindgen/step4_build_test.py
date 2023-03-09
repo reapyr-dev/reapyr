@@ -1,6 +1,7 @@
 import gen_ss_utils as utils
 import subprocess
 import sys
+from pathlib import Path
 
 files_sstypes = ["sstypes.cpp", "sstypes.hpp"]
 
@@ -15,7 +16,7 @@ def cmd(c, data=None):
         data.append(result)
         return process.returncode
     else:
-        process = subprocess.Popen(c, shell=False)
+        process = subprocess.Popen(c.split(" "), shell=False)
         process.wait()
         
         return process.returncode
@@ -28,8 +29,10 @@ def build_and_test():
         quit()
         return False
 
-    data=[]    
-    testresult = cmd(f"{utils.tmp / 'temp_main.exe'}", data=data)
+    data=[]
+    binary = "temp_main"
+    if Path(utils.tmp / "temp_main.exe").is_file(): binary = "temp_main.exe"
+    testresult = cmd(f"{utils.tmp / binary}", data=data)
     print ("Exec result:", testresult, data)
     if testresult==0 and len(data) ==1 and data[0].strip() == "OK":
         return True

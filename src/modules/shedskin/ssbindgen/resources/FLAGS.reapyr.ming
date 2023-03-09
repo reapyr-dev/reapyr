@@ -1,0 +1,4 @@
+DEPSDIR=${REAPYR_SDK_ROOT}/deps/installed
+CC=g++
+CCFLAGS=-O2 -DWIN32 -std=c++17 -march=native -Wno-deprecated -Wl,--enable-auto-import -I${DEPSDIR}/include -I./build/ $(CPPFLAGS)
+LFLAGS=-L${DEPSDIR}/lib -static -lgc -lpcre -lgccpp -lraylib  -lopengl32 -lgdi32 -lwinmm $(LDFLAGS)

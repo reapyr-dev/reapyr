@@ -1,3 +1,24 @@
+unameOut="$(uname -s)"
+machine="UNKNOWN:${unameOut}"
+maketype=""
+libext="so"
+case "${unameOut}" in
+    Linux*)     
+      machine=Linux
+      ;;
+    Darwin*)    
+      machine=Mac
+      ;;
+    CYGWIN*)    
+      machine=Cygwin
+      ;;
+    MINGW*)     
+      machine=MinGw
+      maketype="-G MinGW Makefiles"
+      libext="dll"
+      ;;
+esac
+
 # Build Raylib 
 
 # Before building, this applies a patch to enable raygui if not already enabled
@@ -14,7 +35,7 @@ mkdir -p build
 cd build
 
 # Build Raylib shared library (dll/so) here for cpython binding
-cmake -G "MinGW Makefiles" -DBUILD_SHARED_LIBS=ON -DBUILD_EXAMPLES=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$REAPYR_SDK_ROOT/deps/installed ..
+cmake $maketype -DBUILD_SHARED_LIBS=ON -DBUILD_EXAMPLES=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$REAPYR_SDK_ROOT/deps/installed ..
 cmake --build .
 cmake --install .
 
@@ -22,7 +43,7 @@ cmake --install .
 cp $REAPYR_SDK_ROOT/deps/raygui/src/raygui.h $REAPYR_SDK_ROOT/deps/installed/include/
 
 # Build Raylib static library (.a) here for shedskin binding, static linking performance is better
-cmake -G "MinGW Makefiles" -DBUILD_SHARED_LIBS=OFF -DBUILD_EXAMPLES=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$REAPYR_SDK_ROOT/deps/installed ..
+cmake $maketype -DBUILD_SHARED_LIBS=OFF -DBUILD_EXAMPLES=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$REAPYR_SDK_ROOT/deps/installed ..
 cmake --build .
 cmake --install .
 
@@ -30,7 +51,7 @@ cmake --install .
 cd $REAPYR_SDK_ROOT/deps/bdwgc
 mkdir -p build
 cd build
-cmake -G "MinGW Makefiles" -Denable_threads=OFF -Denable_cplusplus=ON -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX=$REAPYR_SDK_ROOT/deps/installed ..
+cmake $maketype -Denable_threads=OFF -Denable_cplusplus=ON -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX=$REAPYR_SDK_ROOT/deps/installed ..
 cmake --build .
 cmake --install .
 
@@ -38,18 +59,18 @@ cmake --install .
 cd $REAPYR_SDK_ROOT/deps/libpcre
 mkdir -p build
 cd build
-cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$REAPYR_SDK_ROOT/deps/installed ..
+cmake $maketype -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$REAPYR_SDK_ROOT/deps/installed ..
 cmake --build .
 cmake --install .
 
 # Copy Raylib DLL to a folder that CPython ctypes lib will be able to find 
 mkdir -p $REAPYR_SDK_ROOT/src/modules/cpython/lib/bin/64bit
-cp $REAPYR_SDK_ROOT/deps/installed/bin/libraylib.dll $REAPYR_SDK_ROOT/src/modules/cpython/lib/bin/64bit/raylib.dll
+cp $REAPYR_SDK_ROOT/deps/installed/bin/libraylib.$libext $REAPYR_SDK_ROOT/src/modules/cpython/lib/bin/64bit/raylib.$libext
 
 # Generate CPython code, which uses ctypes lib to invoke Raylib's C APIs from a DLL
 cd $REAPYR_SDK_ROOT/src/modules/cpython/cpygen
-python ./headers2json.py
-python ./json2cpy.py
+$PYCMD ./headers2json.py
+$PYCMD ./json2cpy.py
 
 # Copy the generated ctypes-compliant raylib python module to a folder next to the .dll.  The
 # module uses its own file path / location on disk to help find the .dll at runtime, hence the 
@@ -58,6 +79,6 @@ cp $REAPYR_SDK_ROOT/src/modules/cpython/cpygen/tmp/raylib.py $REAPYR_SDK_ROOT/sr
 
 # Next script generates Shedskin bindings, runs a test compile and installs bindings to SS lib folder if successful
 cd $REAPYR_SDK_ROOT/src/modules/shedskin/ssbindgen
-python ./gen_ss_bindings.py
+$PYCMD ./gen_ss_bindings.py
 
 echo "Reapyr dependancy build completed, please inspect scrollback for any errors."
