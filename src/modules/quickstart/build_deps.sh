@@ -1,6 +1,6 @@
 unameOut="$(uname -s)"
 machine="UNKNOWN:${unameOut}"
-maketype=""
+maketype="Unix Makefiles"
 libext="so"
 ibin="lib"
 case "${unameOut}" in
@@ -13,9 +13,15 @@ case "${unameOut}" in
     CYGWIN*)    
       machine=Cygwin
       ;;
+    Windows_NT*)
+      machine=MinGw
+      maketype="MinGW Makefiles"
+      libext="dll"
+      ibin="bin"
+      ;;
     MINGW*)     
       machine=MinGw
-      maketype="-G MinGW Makefiles"
+      maketype="MinGW Makefiles"
       libext="dll"
       ibin="bin"
       ;;
@@ -37,7 +43,7 @@ mkdir -p build
 cd build
 
 # Build Raylib shared library (dll/so) here for cpython binding
-cmake $maketype -DBUILD_SHARED_LIBS=ON -DBUILD_EXAMPLES=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$REAPYR_SDK_ROOT/deps/installed ..
+cmake -G "$maketype" -DBUILD_SHARED_LIBS=ON -DBUILD_EXAMPLES=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$REAPYR_SDK_ROOT/deps/installed ..
 cmake --build .
 cmake --install .
 
@@ -45,7 +51,7 @@ cmake --install .
 cp $REAPYR_SDK_ROOT/deps/raygui/src/raygui.h $REAPYR_SDK_ROOT/deps/installed/include/
 
 # Build Raylib static library (.a) here for shedskin binding, static linking performance is better
-cmake $maketype -DBUILD_SHARED_LIBS=OFF -DBUILD_EXAMPLES=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$REAPYR_SDK_ROOT/deps/installed ..
+cmake -G "$maketype" -DBUILD_SHARED_LIBS=OFF -DBUILD_EXAMPLES=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$REAPYR_SDK_ROOT/deps/installed ..
 cmake --build .
 cmake --install .
 
@@ -53,7 +59,7 @@ cmake --install .
 cd $REAPYR_SDK_ROOT/deps/bdwgc
 mkdir -p build
 cd build
-cmake $maketype -Denable_threads=OFF -Denable_cplusplus=ON -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX=$REAPYR_SDK_ROOT/deps/installed ..
+cmake -G "$maketype" -Denable_threads=OFF -Denable_cplusplus=ON -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX=$REAPYR_SDK_ROOT/deps/installed ..
 cmake --build .
 cmake --install .
 
@@ -61,7 +67,7 @@ cmake --install .
 cd $REAPYR_SDK_ROOT/deps/libpcre
 mkdir -p build
 cd build
-cmake $maketype -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$REAPYR_SDK_ROOT/deps/installed ..
+cmake -G "$maketype" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$REAPYR_SDK_ROOT/deps/installed ..
 cmake --build .
 cmake --install .
 

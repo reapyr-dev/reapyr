@@ -4,6 +4,10 @@ unameOut="$(uname -s)"
 mext=".linux"
 bext=""
 case "${unameOut}" in
+    Windows_NT*)
+      mext=".mingw"
+      bext=".exe"
+      ;;
     MINGW*)     
       mext=".mingw"
       bext=".exe"

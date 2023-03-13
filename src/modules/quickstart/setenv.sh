@@ -1,8 +1,13 @@
 pcmd='python3'
-if ! command -v $pcmd &> /dev/null
-then
-    pcmd = 'python3'
-fi
+unameOut="$(uname -s)"
+case "${unameOut}" in
+    Windows_NT*)     
+      pcmd='python'
+      ;;
+    MINGW*)     
+      pcmd='python'
+      ;;
+esac
 export PYCMD=$pcmd
 $pcmd setenv.py > _setvars.sh
 chmod +x _setvars.sh
