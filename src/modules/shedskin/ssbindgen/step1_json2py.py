@@ -75,8 +75,9 @@ def typeValue(ctype, apiParam, classParam):
         return "{}".format(typeParms(ctype))
     
     # Probably a custom class type
-    if classParam: return "None"
-    else: return "{}()".format(utils.maptype(ctype)) # typeParms(ctype)
+    #if classParam: return "None"
+    #else: 
+    return "{}()".format(utils.maptype(ctype)) # typeParms(ctype)
 
 # Main entrypoint for this module. It will iterate every section
 # of the JSON file and generate corresponding Python code.

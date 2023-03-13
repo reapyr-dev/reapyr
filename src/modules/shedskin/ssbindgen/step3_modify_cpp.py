@@ -342,6 +342,7 @@ char* rlconvertStringFixed(str* input, char* output) {
 }
 
 template <class T> void convertListFixed(T* input, T* output, int size) {
+    if (input == NULL || output == NULL) return;
     for (int i = 0; i < size; i++)
         output[i] = input[i];
 }
