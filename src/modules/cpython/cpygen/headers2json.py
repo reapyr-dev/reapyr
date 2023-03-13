@@ -112,10 +112,10 @@ def preprocess():
         outHeader = tmp / f"{i.name}.preprocessed"
         open(outHeader, "w").write(output)
 
-def runparser():
+def runparser():    
+    os.system(f"gcc {root/'deps/raylib/parser/raylib_parser.c'}")
     binary = "a.out"
     if Path(folder / "a.exe").is_file(): binary = "a.exe"
-    os.system(f"gcc {root/'deps/raylib/parser/raylib_parser.c'}")
     idx = 0
     for i in headers:
         out_header = tmp / f"{i.name}.preprocessed"
